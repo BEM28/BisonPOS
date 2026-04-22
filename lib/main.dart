@@ -7,6 +7,8 @@ import 'package:bison_pos/providers/order_provider.dart';
 import 'package:bison_pos/screens/login_screen.dart';
 import 'package:bison_pos/screens/pos_home_screen.dart';
 import 'package:bison_pos/screens/customer_menu_screen.dart';
+import 'package:bison_pos/screens/dashboard_screen.dart';
+import 'package:bison_pos/screens/manage_products_screen.dart';
 
 void main() {
   runApp(const BisonPosApp());
@@ -39,6 +41,8 @@ class BisonPosApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/pos': (context) => const PosHomeScreen(),
           '/customer': (context) => const CustomerMenuScreen(),
+          '/dashboard': (context) => const DashboardScreen(),
+          '/manage_products': (context) => const ManageProductsScreen(),
         },
       ),
     );

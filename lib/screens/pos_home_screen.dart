@@ -6,6 +6,7 @@ import 'package:bison_pos/providers/auth_provider.dart';
 import 'package:bison_pos/providers/product_provider.dart';
 import 'package:bison_pos/providers/cart_provider.dart';
 import 'package:bison_pos/screens/cart_sidebar.dart';
+import 'package:bison_pos/screens/main_drawer.dart';
 
 class PosHomeScreen extends StatefulWidget {
   const PosHomeScreen({super.key});
@@ -16,6 +17,14 @@ class PosHomeScreen extends StatefulWidget {
 
 class _PosHomeScreenState extends State<PosHomeScreen> {
   String _selectedCategory = 'Semua';
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +44,7 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
           )
         ],
       ),
+      drawer: const MainDrawer(),
       body: Row(
         children: [
           // Product List Area
@@ -42,6 +52,7 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
             flex: 2,
             child: Column(
               children: [
+                _buildSearchBar(),
                 _buildCategoryFilter(),
                 Expanded(child: _buildProductGrid()),
               ],
@@ -53,6 +64,38 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
             child: CartSidebar(),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Cari produk...',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                  },
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        onChanged: (value) {
+          setState(() {
+            _searchQuery = value.toLowerCase();
+          });
+        },
       ),
     );
   }
@@ -92,9 +135,19 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
 
     return Consumer<ProductProvider>(
       builder: (context, provider, child) {
-        final products = _selectedCategory == 'Semua'
+        // Filter by category
+        var products = _selectedCategory == 'Semua'
             ? provider.products
             : provider.products.where((p) => p.category == _selectedCategory).toList();
+
+        // Filter by search query
+        if (_searchQuery.isNotEmpty) {
+          products = products.where((p) => p.name.toLowerCase().contains(_searchQuery)).toList();
+        }
+
+        if (products.isEmpty) {
+          return const Center(child: Text('Produk tidak ditemukan.'));
+        }
 
         return GridView.builder(
           padding: const EdgeInsets.all(8.0),
@@ -122,7 +175,7 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
                       Text(currencyFormatter.format(product.sellPrice)),
                       Text('Stok: ${product.totalStock}', style: TextStyle(color: product.totalStock < 10 ? Colors.red : Colors.grey)),
                     ],
@@ -137,10 +190,16 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
   }
 
   void _addToCart(Product product) {
+    if (product.totalStock <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Stok habis')));
+      return;
+    }
+
     if (product.hasVariants) {
       _showVariantDialog(product);
     } else {
       Provider.of<CartProvider>(context, listen: false).addItem(product);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${product.name} ditambahkan'), duration: const Duration(milliseconds: 500)));
     }
   }
 
@@ -159,12 +218,12 @@ class _PosHomeScreenState extends State<PosHomeScreen> {
                 final variant = product.variants[index];
                 return ListTile(
                   title: Text(variant.name),
-                  subtitle: Text('Stok: ${variant.stock}'),
-                  trailing: Text('+ Rp${variant.additionalPrice}'),
-                  onTap: () {
+                  subtitle: variant.stock > 0 ? Text('+ Rp${variant.additionalPrice}') : const Text('Habis', style: TextStyle(color: Colors.red)),
+                  onTap: variant.stock > 0 ? () {
                     Provider.of<CartProvider>(context, listen: false).addItem(product, variant: variant);
                     Navigator.pop(context);
-                  },
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${product.name} (${variant.name}) ditambahkan'), duration: const Duration(milliseconds: 500)));
+                  } : null,
                 );
               },
             ),

@@ -52,4 +52,9 @@ class ProductProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void addProduct(Product product) {
+    _products.add(product);
+    notifyListeners();
+  }
 }
