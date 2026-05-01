@@ -4,8 +4,21 @@ import 'package:intl/intl.dart';
 import 'package:bison_pos/providers/cart_provider.dart';
 import 'package:bison_pos/screens/checkout_screen.dart';
 
-class CartSidebar extends StatelessWidget {
+class CartSidebar extends StatefulWidget {
   const CartSidebar({super.key});
+
+  @override
+  State<CartSidebar> createState() => _CartSidebarState();
+}
+
+class _CartSidebarState extends State<CartSidebar> {
+  final TextEditingController _promoController = TextEditingController();
+
+  @override
+  void dispose() {
+    _promoController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +69,61 @@ class CartSidebar extends StatelessWidget {
           ),
           Consumer<CartProvider>(
             builder: (context, cart, child) {
+              if (cart.items.isEmpty) return const SizedBox.shrink();
+              return Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  border: Border(top: BorderSide(color: Colors.grey.shade300)),
+                ),
+                child: Column(
+                  children: [
+                    if (cart.appliedPromoCode == null)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _promoController,
+                              decoration: const InputDecoration(
+                                hintText: 'Kode Promo',
+                                isDense: true,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (_promoController.text.isNotEmpty) {
+                                bool success = cart.applyPromo(_promoController.text);
+                                if (!success) {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Kode promo tidak valid')));
+                                } else {
+                                  _promoController.clear();
+                                }
+                              }
+                            },
+                            child: const Text('Gunakan'),
+                          )
+                        ],
+                      )
+                    else
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Promo: ${cart.appliedPromoCode}', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red, size: 20),
+                            onPressed: () => cart.removePromo(),
+                          )
+                        ],
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+          Consumer<CartProvider>(
+            builder: (context, cart, child) {
               return Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -64,6 +132,24 @@ class CartSidebar extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    if (cart.discountAmount > 0) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Subtotal:', style: TextStyle(fontSize: 16)),
+                          Text(currencyFormatter.format(cart.subtotalAmount), style: const TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Diskon:', style: TextStyle(fontSize: 16, color: Colors.green)),
+                          Text('- ${currencyFormatter.format(cart.discountAmount)}', style: const TextStyle(fontSize: 16, color: Colors.green)),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

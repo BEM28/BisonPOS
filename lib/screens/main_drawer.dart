@@ -42,6 +42,16 @@ class MainDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
+            leading: const Icon(Icons.fingerprint),
+            title: const Text('Absensi Karyawan'),
+            onTap: () {
+              Navigator.pop(context);
+              if (ModalRoute.of(context)?.settings.name != '/attendance') {
+                 Navigator.pushReplacementNamed(context, '/attendance');
+              }
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.point_of_sale),
             title: const Text('POS Kasir'),
             onTap: () {

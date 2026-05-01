@@ -4,11 +4,13 @@ import 'package:bison_pos/providers/auth_provider.dart';
 import 'package:bison_pos/providers/product_provider.dart';
 import 'package:bison_pos/providers/cart_provider.dart';
 import 'package:bison_pos/providers/order_provider.dart';
+import 'package:bison_pos/providers/attendance_provider.dart';
 import 'package:bison_pos/screens/login_screen.dart';
 import 'package:bison_pos/screens/pos_home_screen.dart';
 import 'package:bison_pos/screens/customer_menu_screen.dart';
 import 'package:bison_pos/screens/dashboard_screen.dart';
 import 'package:bison_pos/screens/manage_products_screen.dart';
+import 'package:bison_pos/screens/attendance_screen.dart';
 
 void main() {
   runApp(const BisonPosApp());
@@ -24,6 +26,7 @@ class BisonPosApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceProvider()),
         ChangeNotifierProxyProvider<ProductProvider, OrderProvider>(
           create: (context) => OrderProvider(Provider.of<ProductProvider>(context, listen: false)),
           update: (context, productProvider, previous) => previous ?? OrderProvider(productProvider),
@@ -43,6 +46,7 @@ class BisonPosApp extends StatelessWidget {
           '/customer': (context) => const CustomerMenuScreen(),
           '/dashboard': (context) => const DashboardScreen(),
           '/manage_products': (context) => const ManageProductsScreen(),
+          '/attendance': (context) => const AttendanceScreen(),
         },
       ),
     );

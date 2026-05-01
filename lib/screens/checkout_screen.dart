@@ -28,6 +28,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Total Pembayaran: ${currencyFormatter.format(cart.totalAmount)}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            if (cart.discountAmount > 0) Text('(Termasuk Diskon ${currencyFormatter.format(cart.discountAmount)})', style: const TextStyle(color: Colors.green, fontSize: 16)),
             const SizedBox(height: 30),
             const Text('Metode Pembayaran:', style: TextStyle(fontSize: 18)),
 
