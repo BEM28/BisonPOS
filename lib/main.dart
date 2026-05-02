@@ -5,12 +5,18 @@ import 'package:bison_pos/providers/product_provider.dart';
 import 'package:bison_pos/providers/cart_provider.dart';
 import 'package:bison_pos/providers/order_provider.dart';
 import 'package:bison_pos/providers/attendance_provider.dart';
+import 'package:bison_pos/providers/customer_provider.dart';
+import 'package:bison_pos/providers/shift_provider.dart';
+import 'package:bison_pos/providers/inventory_provider.dart';
 import 'package:bison_pos/screens/login_screen.dart';
 import 'package:bison_pos/screens/pos_home_screen.dart';
 import 'package:bison_pos/screens/customer_menu_screen.dart';
 import 'package:bison_pos/screens/dashboard_screen.dart';
 import 'package:bison_pos/screens/manage_products_screen.dart';
 import 'package:bison_pos/screens/attendance_screen.dart';
+import 'package:bison_pos/screens/customer_management_screen.dart';
+import 'package:bison_pos/screens/shift_schedule_screen.dart';
+import 'package:bison_pos/screens/supply_chain_screen.dart';
 
 void main() {
   runApp(const BisonPosApp());
@@ -27,6 +33,9 @@ class BisonPosApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => AttendanceProvider()),
+        ChangeNotifierProvider(create: (_) => CustomerProvider()),
+        ChangeNotifierProvider(create: (_) => ShiftProvider()),
+        ChangeNotifierProvider(create: (_) => InventoryProvider()),
         ChangeNotifierProxyProvider<ProductProvider, OrderProvider>(
           create: (context) => OrderProvider(Provider.of<ProductProvider>(context, listen: false)),
           update: (context, productProvider, previous) => previous ?? OrderProvider(productProvider),
@@ -47,6 +56,9 @@ class BisonPosApp extends StatelessWidget {
           '/dashboard': (context) => const DashboardScreen(),
           '/manage_products': (context) => const ManageProductsScreen(),
           '/attendance': (context) => const AttendanceScreen(),
+          '/customers': (context) => const CustomerManagementScreen(),
+          '/shifts': (context) => const ShiftScheduleScreen(),
+          '/supply': (context) => const SupplyChainScreen(),
         },
       ),
     );

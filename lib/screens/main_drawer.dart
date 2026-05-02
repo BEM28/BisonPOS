@@ -61,6 +61,16 @@ class MainDrawer extends StatelessWidget {
               }
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.people),
+            title: const Text('CRM & Pelanggan'),
+            onTap: () {
+              Navigator.pop(context);
+              if (ModalRoute.of(context)?.settings.name != '/customers') {
+                 Navigator.pushReplacementNamed(context, '/customers');
+              }
+            },
+          ),
           if (isAdminOrManager) ...[
             ListTile(
               leading: const Icon(Icons.dashboard),
@@ -79,6 +89,26 @@ class MainDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 if (ModalRoute.of(context)?.settings.name != '/manage_products') {
                    Navigator.pushReplacementNamed(context, '/manage_products');
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.schedule),
+              title: const Text('Jadwal Shift'),
+              onTap: () {
+                Navigator.pop(context);
+                if (ModalRoute.of(context)?.settings.name != '/shifts') {
+                   Navigator.pushReplacementNamed(context, '/shifts');
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_shipping),
+              title: const Text('Supply Chain & PO'),
+              onTap: () {
+                Navigator.pop(context);
+                if (ModalRoute.of(context)?.settings.name != '/supply') {
+                   Navigator.pushReplacementNamed(context, '/supply');
                 }
               },
             ),
